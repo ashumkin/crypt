@@ -46,10 +46,10 @@ class Gost
     
     # derive the 32-byte key from the user-supplied key
     userKeyLength = userKey.length
-    @key = userKey[0..31].unpack('C'*32)
     if (userKeyLength < 32)
-      userKeyLength.upto(31) { @key << 0 }
+      userKeyLength.upto(31) { userKey << "\x00" }
     end
+    @key = userKey[0..31].unpack('V'*8)
   end
   
   
@@ -121,17 +121,17 @@ class Gost
   
   
   def encrypt_block(block)
-    xl, xr = block.unpack('NN')
+    xl, xr = block.unpack('VV')
     xl, xr = encrypt_pair(xl, xr)
-    encrypted = [xl, xr].pack('NN')
+    encrypted = [xl, xr].pack('VV')
     return(encrypted)
   end
   
   
   def decrypt_block(block)
-    xl, xr = block.unpack('NN')
+    xl, xr = block.unpack('VV')
     xl, xr = decrypt_pair(xl, xr)
-    decrypted = [xl, xr].pack('NN')
+    decrypted = [xl, xr].pack('VV')
     return(decrypted)
   end
 
